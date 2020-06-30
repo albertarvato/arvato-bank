@@ -1,0 +1,17 @@
+version: '3'
+services:
+  arvatobank:
+     build: arvatobank
+     hostname: arvatobank
+     container_name: arvatobank
+     ports:
+       - "8080:8080"
+     depends_on:
+       - mongodb
+  mongodb:
+    container_name: mongodb
+    hostname: mongodb
+    image: mongo
+    ports:
+      - "27017:27017"
+

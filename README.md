@@ -1,3 +1,0 @@
-# Arvato Bank
-
-fintech app
