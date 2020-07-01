@@ -1,5 +1,7 @@
 package com.arvato.spring.controllers.rest;
 
+import com.arvato.spring.jms.Sender;
+import com.arvato.spring.jms.SenderSource;
 import com.arvato.spring.models.Account;
 import com.arvato.spring.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,9 @@ class AccountController {
 
     @Autowired
     private AccountRepository accounts;
+
+    @Autowired
+    private Sender sender;
 
     @PostMapping("")
     public Mono<Account> create(@RequestBody Account Account) {
@@ -36,6 +41,12 @@ class AccountController {
     @GetMapping("/balance")
     public Mono<Double> get() {
        return null;
+    }
+
+    @GetMapping("/testJMS")
+    public String testJMS(){
+        sender.send(SenderSource.ACCOUNT_TEST);
+        return "check if in the console the receiver worked";
     }
 
 }

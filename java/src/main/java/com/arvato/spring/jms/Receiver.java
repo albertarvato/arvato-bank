@@ -1,18 +1,22 @@
 package com.arvato.spring.jms;
 
-import com.arvato.spring.models.HelloMessage;
+import com.arvato.spring.email.EmailService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.command.ActiveMQObjectMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
 public class Receiver {
+    @Autowired
+    private EmailService emailService;
+
     @JmsListener(destination = "jmsMessageString")
-    public void receive(String message) {
+    public void receive(Map<String, String> message) {
         log.info("Received message " + message);
+        emailService.sendMail(message.get(Sender.SENDER_EMAIL_KEY), message.get(Sender.SENDER_SUBJECT_KEY), message.get(Sender.SENDER_CONTENT_KEY));
     }
 }
