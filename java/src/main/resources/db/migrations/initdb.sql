@@ -1,0 +1,1 @@
+CREATE TABLE test (id SERIAL PRIMARY KEY, title VARCHAR(255), content VARCHAR(255));
