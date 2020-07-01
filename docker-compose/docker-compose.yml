@@ -11,12 +11,12 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  arvatobank:
-     build: arvatobank
-     hostname: arvatobank
-     container_name: arvatobank
-     ports:
-       - "8080:8080"
-     depends_on:
-       - postgresdb
+  # arvatobank:
+  #    build: arvatobank
+  #    hostname: arvatobank
+  #    container_name: arvatobank
+  #    ports:
+  #      - "8080:8080"
+  #    depends_on:
+  #      - postgresdb
 
