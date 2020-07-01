@@ -8,6 +8,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -26,7 +32,40 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser("vasilika")
                 .password("analfaboss")
                 .authorities("ROLE_USER");
+
     }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.cors()
+                .and().authorizeRequests()
+                .anyRequest().permitAll()
+                .and().csrf().disable();
+    }
+
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(Collections.unmodifiableList(Arrays.asList("http://localhost:8081")));  //set access from all domains
+        configuration.setAllowedMethods(Collections.unmodifiableList(Arrays.asList("GET", "POST", "PUT", "DELETE")));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Collections.unmodifiableList(Arrays.asList(
+                "Authorization",
+                "Cache-Control",
+                "Content-Type",
+                "Origin"
+        )));
+
+
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
 
 //    @Override
 //    protected void configure(HttpSecurity httpSecurity) throws Exception {

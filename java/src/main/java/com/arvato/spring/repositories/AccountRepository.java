@@ -5,7 +5,6 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
 
-public interface AccountRepository extends ReactiveCrudRepository<Account, Long> {
+public interface AccountRepository extends ReactiveCrudRepository<Account, Integer> {
 
-    Mono<Account> findById(Integer id);
 }
