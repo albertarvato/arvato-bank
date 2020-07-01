@@ -3,6 +3,7 @@ package com.arvato.spring.controllers.rest;
 import com.arvato.spring.models.Account;
 import com.arvato.spring.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -10,7 +11,10 @@ import reactor.core.publisher.Mono;
 @RequestMapping(value = "/user")
 @RequiredArgsConstructor
 class AccountController {
-    private final AccountRepository accounts;
+
+    @Autowired
+    private AccountRepository accounts;
+
     @PostMapping("")
     public Mono<Account> create(@RequestBody Account Account) {
         return this.accounts.save(Account);
@@ -31,7 +35,7 @@ class AccountController {
 
     @GetMapping("/balance")
     public Mono<Double> get() {
-        // to implement
+       return null;
     }
 
 }

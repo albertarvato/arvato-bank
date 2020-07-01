@@ -4,7 +4,7 @@ import com.arvato.spring.models.Transaction;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
 
-public interface TransactionRepository extends ReactiveCrudRepository<Transaction, Long> {
+public interface TransactionRepository extends ReactiveCrudRepository<Transaction, Integer> {
 
 
 }
