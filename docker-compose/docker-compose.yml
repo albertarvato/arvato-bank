@@ -8,10 +8,16 @@ services:
        - "8080:8080"
      depends_on:
        - mongodb
-  mongodb:
-    container_name: mongodb
-    hostname: mongodb
-    image: mongo
+  db:
+    container_name: db
+    hostname: db
+    build: db
+    volumes:
+      - /var/lib/postgresql/data
     ports:
-      - "27017:27017"
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=arvatobank
 
