@@ -1,17 +1,9 @@
 version: '3'
 services:
-  arvatobank:
-     build: arvatobank
-     hostname: arvatobank
-     container_name: arvatobank
-     ports:
-       - "8080:8080"
-     depends_on:
-       - mongodb
-  db:
-    container_name: db
-    hostname: db
-    build: db
+  postgresdb:
+    container_name: postgresdb
+    hostname: postgresdb
+    image: postgres:12.2-alpine
     volumes:
       - /var/lib/postgresql/data
     ports:
@@ -20,4 +12,12 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_MULTIPLE_DATABASES=arvatobank
+  arvatobank:
+     build: arvatobank
+     hostname: arvatobank
+     container_name: arvatobank
+     ports:
+       - "8080:8080"
+     depends_on:
+       - postgresdb
 
