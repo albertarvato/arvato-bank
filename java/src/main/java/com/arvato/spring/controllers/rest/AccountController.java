@@ -19,6 +19,7 @@ class AccountController {
     public Mono<Account> create(@RequestBody Account Account) {
         return this.accounts.save(Account);
     }
+
     @GetMapping("/{id}")
     public Mono<Account> get(@PathVariable("id") Integer id) {
         return this.accounts.findById(id);
