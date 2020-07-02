@@ -28,6 +28,24 @@ public class Sender {
                 dataMap.put(SENDER_EMAIL_KEY, "email"); //TODO take it from the user that made the request
                 break;
             }
+            case ACCOUNT_CREATED:{
+                dataMap.put(SENDER_CONTENT_KEY, "Your account at Arvato bank has been successfully created!");
+                dataMap.put(SENDER_SUBJECT_KEY, "Arvato Bank - Account created");
+                dataMap.put(SENDER_EMAIL_KEY, "email"); //TODO take it from the user that made the request
+                break;
+            }
+            case ACCOUNT_UPDATED:{
+                dataMap.put(SENDER_CONTENT_KEY, "Your account at Arvato bank has been successfully updated!");
+                dataMap.put(SENDER_SUBJECT_KEY, "Arvato Bank - Account updated");
+                dataMap.put(SENDER_EMAIL_KEY, "email"); //TODO take it from the user that made the request
+                break;
+            }
+            case ACCOUNT_BALANCE_RUN:{
+                dataMap.put(SENDER_CONTENT_KEY, "Your request for account balance at Arvato bank has been successfully processed!");
+                dataMap.put(SENDER_SUBJECT_KEY, "Arvato Bank - Balance");
+                dataMap.put(SENDER_EMAIL_KEY, "email"); //TODO take it from the user that made the request
+                break;
+            }
         }
         if (dataMap.isEmpty()){
             log.error("Configuration error for JMS");

@@ -22,7 +22,9 @@ class AccountController {
 
     @PostMapping("")
     public Mono<Account> create(@RequestBody Account Account) {
-        return this.accounts.save(Account);
+        Mono<Account> accountMono = this.accounts.save(Account);
+        sender.send(SenderSource.ACCOUNT_CREATED);
+        return accountMono;
     }
     @GetMapping("/{id}")
     public Mono<Account> get(@PathVariable("id") Integer id) {
@@ -30,17 +32,21 @@ class AccountController {
     }
     @PutMapping("/{id}")
     public Mono<Account> update(@PathVariable("id") Integer id, @RequestBody Account Account) {
-        return this.accounts.findById(id)
+        Mono<Account> accountMono = this.accounts.findById(id)
                 .map(a -> {
 //                    p.setName(Account.setName());
                     return a;
                 })
                 .flatMap(a -> this.accounts.save(a));
+
+        sender.send(SenderSource.ACCOUNT_UPDATED);
+        return accountMono;
     }
 
     @GetMapping("/balance")
     public Mono<Double> get() {
-       return null;
+       sender.send(SenderSource.ACCOUNT_BALANCE_RUN);
+        return null;
     }
 
     @GetMapping("/testJMS")
