@@ -30,14 +30,9 @@ public class JwtRequestFilter extends AbstractAuthenticationProcessingFilter {
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
-    protected JwtRequestFilter(String defaultFilterProcessesUrl) {
-        super(defaultFilterProcessesUrl);
+    public JwtRequestFilter() {
+        super("/**");
     }
-
-    protected JwtRequestFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
-        super(requiresAuthenticationRequestMatcher);
-    }
-
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {

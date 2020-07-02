@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Autowired
-    private LoginRepository loginRepo;
+    private MyUserDetailsService myUserDetailsService;
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // configure AuthenticationManager so that it knows from where to load
         // user for matching credentials
         // Use BCryptPasswordEncoder
-        auth.userDetailsService(loginRepo).passwordEncoder(encoder());
+        auth.userDetailsService(myUserDetailsService).passwordEncoder(encoder());
     }
 
     @Autowired
@@ -51,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // configure AuthenticationManager so that it knows from where to load
         // user for matching credentials
         // Use BCryptPasswordEncoder
-        auth.userDetailsService(loginRepo).passwordEncoder(encoder());
+        auth.userDetailsService(myUserDetailsService).passwordEncoder(encoder());
     }
 
     @Autowired
@@ -59,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // configure AuthenticationManager so that it knows from where to load
         // user for matching credentials
         // Use BCryptPasswordEncoder
-        auth.userDetailsService(loginRepo).passwordEncoder(encoder());
+        auth.userDetailsService(myUserDetailsService).passwordEncoder(encoder());
     }
 
 
@@ -71,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.userDetailsService(loginRepo);
+        http.userDetailsService(myUserDetailsService);
 
         http.cors()
                 .and().authorizeRequests()

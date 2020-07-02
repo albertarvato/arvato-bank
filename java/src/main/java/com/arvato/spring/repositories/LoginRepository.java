@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-@Repository("loginRepo")
 public interface LoginRepository extends CrudRepository<Account, Integer> {
 
     @Query("Select * from Account where username = ?username")
