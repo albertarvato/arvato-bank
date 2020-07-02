@@ -1,15 +1,12 @@
 package com.arvato.spring.configurations;
 
-import com.arvato.spring.security.JwtAuthenticationEntryPoint;
-import com.arvato.spring.security.JwtRequestFilter;
 import com.arvato.spring.repositories.LoginRepository;
+import com.arvato.spring.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,7 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,23 +30,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private MyUserDetailsService myUserDetailsService;
 
     @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+    private JWTTokenUtil jwtTokenUtil;
 
     @Autowired
-    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        // configure AuthenticationManager so that it knows from where to load
-        // user for matching credentials
-        // Use BCryptPasswordEncoder
-        auth.userDetailsService(myUserDetailsService).passwordEncoder(encoder());
-    }
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        // configure AuthenticationManager so that it knows from where to load
-        // user for matching credentials
-        // Use BCryptPasswordEncoder
-        auth.userDetailsService(myUserDetailsService).passwordEncoder(encoder());
-    }
+    private LoginRepository loginRepo;
 
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -59,7 +42,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Use BCryptPasswordEncoder
         auth.userDetailsService(myUserDetailsService).passwordEncoder(encoder());
     }
-
 
     @Bean
     @Override
@@ -71,18 +53,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.userDetailsService(myUserDetailsService);
 
-        http.cors()
-                .and().authorizeRequests()
-//                .antMatchers(HttpMethod.POST, "/login", "/user").permitAll()
-                .anyRequest().permitAll()
-                .and().csrf().disable()
+        http.cors().and().csrf().disable()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/login").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(new JwtRequestFilter(authenticationManager(), loginRepo, jwtTokenUtil))
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        ;
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

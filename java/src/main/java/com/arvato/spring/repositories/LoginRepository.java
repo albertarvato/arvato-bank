@@ -1,11 +1,10 @@
 package com.arvato.spring.repositories;
 
 import com.arvato.spring.models.Account;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Mono;
 
 public interface LoginRepository extends ReactiveCrudRepository<Account, Integer> {
 
-    @Query("Select * from Account where username = ?username")
-    Account loadUserByUsername(String username);
+    Mono<Account> findByUsername(String username);
 }

@@ -4,44 +4,38 @@ package com.arvato.spring.security;
 import com.arvato.spring.models.Account;
 import com.arvato.spring.repositories.LoginRepository;
 import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
-public class JwtRequestFilter extends AbstractAuthenticationProcessingFilter {
-    @Autowired
+public class JwtRequestFilter extends BasicAuthenticationFilter {
+
     private LoginRepository loginRepo;
-    @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
-    public JwtRequestFilter() {
-        super("/**");
+    public JwtRequestFilter(AuthenticationManager authenticationManager, LoginRepository loginRepo, JWTTokenUtil jwtTokenUtil) {
+        super(authenticationManager);
+        this.loginRepo = loginRepo;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    @Autowired
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        super.setAuthenticationManager(authenticationManager);
-    }
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws IOException, ServletException {
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
-// JWT Token is in the form "Bearer token". Remove Bearer word and get
-// only the Token
+        // JWT Token is in the form "Bearer token". Remove Bearer word and get
+        // only the Token
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
@@ -54,26 +48,20 @@ public class JwtRequestFilter extends AbstractAuthenticationProcessingFilter {
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
         }
-// Once we get the token validate it.
+        // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            Account userDetails = this.loginRepo.loadUserByUsername(username);
-// if token is valid configure Spring Security to manually set
-// authentication
-            if (jwtTokenUtil.validateToken(jwtToken, userDetails.getUsername())) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null);
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-// After setting the Authentication in the context, we specify
-// that the current user is authenticated. So it passes the
-// Spring Security Configurations successfully.
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            Account account = this.loginRepo.findByUsername(username).block();
+            // if token is valid configure Spring Security to manually set
+            // authentication
+            if (account != null && jwtTokenUtil.validateToken(jwtToken, account.getUsername())) {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                return usernamePasswordAuthenticationToken;
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 
-        return null;
+        chain.doFilter(request, response);
     }
 
 }

@@ -1,5 +1,6 @@
-package com.arvato.spring.configurations;
+package com.arvato.spring.security;
 
+import com.arvato.spring.configurations.MyUserDetails;
 import com.arvato.spring.models.Account;
 import com.arvato.spring.repositories.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        Account account = loginRepository.loadUserByUsername(s);
+        Account account = loginRepository.findByUsername(s).block();
 
         MyUserDetails u = new MyUserDetails();
         u.setAccount(account);
