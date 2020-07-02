@@ -1,6 +1,7 @@
 package com.arvato.spring.controllers.rest;
 
 
+import com.arvato.spring.configurations.MyUserDetailsService;
 import com.arvato.spring.repositories.LoginRepository;
 import com.arvato.spring.security.JWTTokenUtil;
 import com.arvato.spring.security.JwtRequest;
@@ -28,13 +29,13 @@ public class JwtAuthenticationController {
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
     @Autowired
-    private LoginRepository loginRepo;
+    private MyUserDetailsService myUserDetailsService;
 
     @PostMapping(value = "")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
-        final UserDetails userDetails = loginRepo
+        final UserDetails userDetails = myUserDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);

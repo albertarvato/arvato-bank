@@ -7,27 +7,40 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.arvato.spring.models.Account;
 import com.arvato.spring.repositories.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
-public class JwtRequestFilter extends OncePerRequestFilter {
+public class JwtRequestFilter extends AbstractAuthenticationProcessingFilter {
     @Autowired
     private LoginRepository loginRepo;
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
+    protected JwtRequestFilter(String defaultFilterProcessesUrl) {
+        super(defaultFilterProcessesUrl);
+    }
+
+    protected JwtRequestFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
+        super(requiresAuthenticationRequestMatcher);
+    }
+
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
@@ -47,10 +60,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.loginRepo.loadUserByUsername(username);
+            Account userDetails = this.loginRepo.loadUserByUsername(username);
 // if token is valid configure Spring Security to manually set
 // authentication
-            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+            if (jwtTokenUtil.validateToken(jwtToken, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null);
                 usernamePasswordAuthenticationToken
@@ -59,8 +72,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 // that the current user is authenticated. So it passes the
 // Spring Security Configurations successfully.
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+                return usernamePasswordAuthenticationToken;
             }
         }
-        chain.doFilter(request, response);
+
+        return null;
     }
+
 }
