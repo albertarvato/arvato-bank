@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -46,7 +47,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
         final String token = jwtTokenUtil.generateToken(userDetails);
 
-        res.addHeader("Authorization", "Bearer " + token);
+        try {
+            res.getWriter().write("{token:Bearer " + token);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
