@@ -11,9 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import reactor.core.publisher.Mono;
 
 
-public interface AccountRepository extends ReactiveCrudRepository<Account, Integer>, UserDetailsService {
+public interface AccountRepository extends ReactiveCrudRepository<Account, Integer> {
 
-    @Override
     @Query("{ 'username': ?0}")
-    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+    Mono<UserDetails> loadUserByUsername(String username) throws UsernameNotFoundException;
 }

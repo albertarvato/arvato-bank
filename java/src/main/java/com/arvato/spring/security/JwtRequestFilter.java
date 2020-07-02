@@ -7,8 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.arvato.spring.models.Account;
-import com.arvato.spring.repositories.AccountRepository;
+import com.arvato.spring.repositories.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +21,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
-    private AccountRepository jwtUserDetailsService;
+    private LoginRepository loginRepo;
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
@@ -48,7 +47,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = this.loginRepo.loadUserByUsername(username);
 // if token is valid configure Spring Security to manually set
 // authentication
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
