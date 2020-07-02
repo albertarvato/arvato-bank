@@ -21,7 +21,7 @@ services:
   arvatobank:
     build:
       context: ./arvatobank
-      dockerfile: docker-compose-dev.yml
+      dockerfile: Dockerfile-dev
     hostname: arvatobank
     container_name: arvatobank
     ports:
