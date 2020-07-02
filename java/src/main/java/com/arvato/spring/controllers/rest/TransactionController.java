@@ -21,10 +21,8 @@ class TransactionController {
         return this.transactions.save(Transaction);
     }
 
-    @GetMapping("")
-    public Flux<Transaction> get(@PathVariable("id") Integer id) {
-        // todo modify repo to have findall of current user
-        return this.transactions.findAll();
+    @GetMapping("/{userId}")
+    public Flux<Transaction> getAllByUser(@PathVariable("userId") Integer userId) {
+        return this.transactions.findAllBy(userId);
     }
-
 }

@@ -4,6 +4,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import java.time.OffsetDateTime;
@@ -20,7 +22,7 @@ public class Transaction {
     @Column("transaction_id")
     private Integer transactionId;
     @Column("created")
-    private OffsetDateTime created;
+    private LocalDateTime created;
     @Column("account_from")
     private Integer accountFrom;
     @Column("account_to")
