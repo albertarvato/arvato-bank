@@ -1,8 +1,10 @@
 package com.arvato.spring.jms;
 
 import com.arvato.spring.email.EmailService;
+import com.arvato.spring.email.EmailServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
