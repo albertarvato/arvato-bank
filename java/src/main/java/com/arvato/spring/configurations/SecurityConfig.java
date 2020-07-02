@@ -1,21 +1,13 @@
 package com.arvato.spring.configurations;
 
-import com.arvato.spring.security.JwtAuthenticationEntryPoint;
-import com.arvato.spring.security.JwtRequestFilter;
-import com.arvato.spring.repositories.LoginRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -27,44 +19,32 @@ import java.util.Collections;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    @Autowired
-    private LoginRepository loginRepo;
-
-    @Autowired
-    private JwtRequestFilter jwtRequestFilter;
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        // configure AuthenticationManager so that it knows from where to load
-        // user for matching credentials
-        // Use BCryptPasswordEncoder
-        auth.userDetailsService(loginRepo).passwordEncoder(encoder());
-    }
-
-
-    @Bean
     @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+
+        auth.
+                inMemoryAuthentication()
+//                .passwordEncoder(encoder())
+                .withUser("giku")
+                .password("bramburici")
+                .authorities("ROLE_USER")
+                .and()
+                .withUser("vasilika")
+                .password("analfaboss")
+                .authorities("ROLE_USER");
+
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.cors()
                 .and().authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/login", "/user").permitAll()
+                .antMatchers("/user/**").permitAll()
+                .antMatchers("/transaction/**").permitAll()
                 .anyRequest().authenticated()
-                .and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .and().csrf().disable();
     }
+
 
 
     @Bean
@@ -88,6 +68,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return source;
     }
 
+
+//    @Override
+//    protected void configure(HttpSecurity httpSecurity) throws Exception {
+//
+//        httpSecurity
+//                .authorizeRequests()
+//                .antMatchers(HttpMethod.GET, "/user/*").hasRole("ROLE_USER")
+//                .antMatchers(HttpMethod.PUT, "/user/*").hasRole("ROLE_USER")
+//                .antMatchers("/transactions").hasRole("ROLE_USER")
+//                .antMatchers(HttpMethod.POST, "/user").permitAll()
+//                .antMatchers(HttpMethod.POST, "/login").permitAll();
+//    }
 
     @Bean
     protected BCryptPasswordEncoder encoder() {
