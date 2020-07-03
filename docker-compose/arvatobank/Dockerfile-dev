@@ -1,0 +1,11 @@
+FROM adoptopenjdk/openjdk8:jdk8u242-b08-alpine
+
+COPY entrypoint-dev.sh /home/entrypoint-dev.sh
+RUN chown root:root /home/entrypoint-dev.sh
+RUN chmod +x /home/entrypoint-dev.sh
+WORKDIR /home/
+
+ENTRYPOINT ["/home/entrypoint-dev.sh"]
+
+EXPOSE 8080
+

@@ -1,0 +1,42 @@
+version: '3'
+services:
+  postgresdb:
+    container_name: postgresdb
+    hostname: postgresdb
+    image: postgres:12.2-alpine
+    volumes:
+      - /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  mailhog:
+    container_name: mailhog
+    hostname: mailhog
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025
+      - 8025:8025
+  arvatobank:
+    build:
+      context: ./arvatobank
+      dockerfile: Dockerfile-dev
+    hostname: arvatobank
+    container_name: arvatobank
+    volumes:
+      - ./arvatobank/dist:/home/dist
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgresdb
+      - mailhog
+  ui:
+    build: ui
+    hostname: ui
+    container_name: ui
+    volumes:
+      - ./ui/dist:/home/dist
+    ports:
+      - "9090:9090"
+

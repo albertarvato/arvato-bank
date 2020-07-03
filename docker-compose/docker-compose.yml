@@ -11,12 +11,29 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  # arvatobank:
-  #    build: arvatobank
-  #    hostname: arvatobank
-  #    container_name: arvatobank
-  #    ports:
-  #      - "8080:8080"
-  #    depends_on:
-  #      - postgresdb
-
+  mailhog:
+    container_name: mailhog
+    hostname: mailhog
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025
+      - 8025:8025
+  arvatobank:
+    build: arvatobank
+    hostname: arvatobank
+    container_name: arvatobank
+    volumes:
+      - ./arvatobank/dist:/home/dist
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgresdb
+      - mailhog
+  ui:
+    build: ui
+    hostname: ui
+    container_name: ui
+    volumes:
+      - ./ui/dist:/home/dist
+    ports:
+      - "9090:9090"

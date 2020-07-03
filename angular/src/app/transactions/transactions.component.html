@@ -1,0 +1,20 @@
+
+<div class="container">
+    <mat-card> 
+
+        <mat-form-field>
+            <mat-label>Send Coins to:</mat-label>
+            <input [formControl]="targetUser" matInput placeholder="User ID" type="number">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Amount:</mat-label>
+            <input [formControl]="amount" matInput placeholder="Amount" type="number">
+        </mat-form-field>
+          <button mat-flat-button color="primary" (click)="sendMoney()">SEND</button>
+
+        <mat-list role="list">
+            <mat-list-item role="listitem" *ngFor="let transaction of transactions">{{transaction | json}}</mat-list-item>
+          </mat-list>
+
+    </mat-card>
+</div>
