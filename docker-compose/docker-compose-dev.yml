@@ -19,7 +19,9 @@ services:
       - 1025:1025
       - 8025:8025
   arvatobank:
-    build: arvatobank
+    build:
+      context: ./arvatobank
+      dockerfile: Dockerfile-dev
     hostname: arvatobank
     container_name: arvatobank
     ports:
