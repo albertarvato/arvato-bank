@@ -2,4 +2,4 @@
 
 set -e
 
-java -jar spring-0.0.1-SNAPSHOT.jar
+java -jar /home/dist/spring-0.0.1-SNAPSHOT.jar
