@@ -1,6 +1,6 @@
 CREATE TABLE transaction(
                             transaction_id serial PRIMARY KEY,
-                            created TIMESTAMP NOT NULL,
+                            created TIMESTAMP NOT NULL DEFAULT CURRENT_DATE,
                             value INTEGER NOT NULL,
                             account_from INTEGER NOT NULL,
                             account_to INTEGER NOT NULL,

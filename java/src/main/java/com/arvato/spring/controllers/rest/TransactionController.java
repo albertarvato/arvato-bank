@@ -5,8 +5,8 @@ import com.arvato.spring.repositories.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController()
 @RequestMapping(value = "/transaction")
@@ -14,17 +14,26 @@ import reactor.core.publisher.Mono;
 class TransactionController {
 
     @Autowired
-    private TransactionRepository transactions;
+    private TransactionRepository transactionRepository;
 
     @PostMapping("")
-    public Mono<Transaction> create(@RequestBody Transaction Transaction) {
-        return this.transactions.save(Transaction);
+    public Transaction create(@RequestBody Transaction transaction) {
+        return this.transactionRepository.save(transaction);
     }
 
     @GetMapping("")
-    public Flux<Transaction> get(@PathVariable("id") Integer id) {
-        // todo modify repo to have findall of current user
-        return this.transactions.findAll();
+    public List<Transaction> getAllTransactions() {
+        return this.transactionRepository.findAll();
+    }
+
+    @GetMapping("/from/{id}")
+    public List<Transaction> getFrom(@PathVariable("id") Integer fromId) {
+        return this.transactionRepository.findAllByAccountFrom(fromId);
+    }
+
+    @GetMapping("/to/{id}")
+    public List<Transaction> getTo(@PathVariable("id") Integer toId) {
+        return this.transactionRepository.findAllByAccountTo(toId);
     }
 
 }

@@ -1,11 +1,11 @@
 package com.arvato.spring.models;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-import java.time.OffsetDateTime;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.OffsetDateTime;
 
 @Data
@@ -13,18 +13,19 @@ import java.time.OffsetDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("transaction")
+@Entity
+@Table(name = "transaction")
 public class Transaction {
 
     @Id
-    @Column("transaction_id")
+    @Column(name = "transaction_id")
     private Integer transactionId;
-    @Column("created")
+    @Column(name = "created")
     private OffsetDateTime created;
-    @Column("account_from")
+    @Column(name = "account_from")
     private Integer accountFrom;
-    @Column("account_to")
+    @Column(name = "account_to")
     private Integer accountTo;
-    @Column("value")
+    @Column(name = "value")
     private Integer value;
 }

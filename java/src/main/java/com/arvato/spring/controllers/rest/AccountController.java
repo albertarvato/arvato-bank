@@ -1,12 +1,14 @@
 package com.arvato.spring.controllers.rest;
 
+import com.arvato.spring.error.ResourceNotFoundException;
 import com.arvato.spring.models.Account;
 import com.arvato.spring.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @RestController()
 @RequestMapping(value = "/user")
@@ -14,35 +16,40 @@ import reactor.core.publisher.Mono;
 class AccountController {
 
     @Autowired
-    private AccountRepository accounts;
+    private AccountRepository accountRepository;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
 
     @PostMapping("")
-    public Mono<Account> create(@RequestBody Account account) {
+    public Account create(@RequestBody Account account) {
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        return this.accounts.save(account);
+        return this.accountRepository.save(account);
     }
 
     @GetMapping("/{id}")
-    public Mono<Account> get(@PathVariable("id") Integer id) {
-        return this.accounts.findById(id);
+    public Optional<Account> get(@PathVariable("id") Integer id) {
+        return this.accountRepository.findById(id);
     }
 
     @PutMapping("/{id}")
-    public Mono<Account> update(@PathVariable("id") Integer id, @RequestBody Account Account) {
-        return this.accounts.findById(id)
-                .map(a -> {
-//                    p.setName(Account.setName());
-                    return a;
+    public Account update(@PathVariable("id") Integer id, @RequestBody Account acc) {
+        return accountRepository.findById(id)
+                .map(account -> {
+                    account.setUsername(acc.getUsername());
+                    account.setEmail(acc.getEmail());
+                    account.setFullname(acc.getFullname());
+                    account.setIban(acc.getIban());
+                    account.setMobile(acc.getMobile());
+
+                    return accountRepository.save(account);
                 })
-                .flatMap(a -> this.accounts.save(a));
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @GetMapping("/balance")
-    public Mono<Double> get() {
+    public Double get() {
         return null;
     }
 

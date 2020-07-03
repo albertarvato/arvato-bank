@@ -1,36 +1,63 @@
 package com.arvato.spring.models;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Collection;
+import java.util.Collections;
 
 @Data
 @ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("account")
-public class Account  {
+@Entity
+@Table(name = "account")
+public class Account implements UserDetails {
 
     @Id
-    @Column("account_id")
+    @Column(name = "account_id")
     private Integer accountId;
-    @Column("username")
+    @Column(name = "username")
     private String username;
-    @Column("password")
+    @Column(name = "password")
     private String password;
-    @Column("fullname")
+    @Column(name = "fullname")
     private String fullname;
-    @Column("mobile")
+    @Column(name = "mobile")
     private String mobile;
-    @Column("email")
+    @Column(name = "email")
     private String email;
-    @Column("iban")
+    @Column(name = "iban")
     private String iban;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
