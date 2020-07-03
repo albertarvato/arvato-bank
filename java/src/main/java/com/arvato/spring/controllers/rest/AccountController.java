@@ -8,6 +8,7 @@ import com.arvato.spring.repositories.TransactionRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
+import java.util.TimerTask;
 
 @RestController()
 @RequestMapping(value = "/user")
@@ -28,6 +31,8 @@ class AccountController {
     private TransactionRepository transactions;
     @Autowired
     private Sender sender;
+    @Autowired
+    private SimpMessagingTemplate webSocket;
 
     @PostMapping("")
     public Mono<Account> create(@RequestBody Account Account) {
@@ -69,4 +74,23 @@ class AccountController {
         sender.send(SenderSource.ACCOUNT_TEST);
         return "check if in the console the receiver worked";
     }
+
+    @GetMapping("/{id}/startspam")
+    public Mono<Double> spam(@PathVariable("id") Integer id) {
+
+        java.util.Timer t = new java.util.Timer();
+        t.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                webSocket.setDefaultDestination("/topic/balance/" + id.toString());
+                webSocket.convertAndSend(Math.random());
+
+            }
+        }, 2000, 2000);
+
+        return null;
+    }
+
+
 }

@@ -24,9 +24,19 @@ services:
       dockerfile: Dockerfile-dev
     hostname: arvatobank
     container_name: arvatobank
+    volumes:
+      - ./arvatobank/dist:/home/dist
     ports:
       - "8080:8080"
     depends_on:
       - postgresdb
       - mailhog
+  ui:
+    build: ui
+    hostname: ui
+    container_name: ui
+    volumes:
+      - ./ui/dist:/home/dist
+    ports:
+      - "9090:9090"
 
