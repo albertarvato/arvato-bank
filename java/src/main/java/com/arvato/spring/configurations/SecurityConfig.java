@@ -4,9 +4,11 @@ import com.arvato.spring.repositories.LoginRepository;
 import com.arvato.spring.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -20,7 +22,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
+@Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -34,6 +38,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private LoginRepository loginRepo;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtRequestFilter;
+
 
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -53,17 +61,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.userDetailsService(myUserDetailsService);
 
-        http.cors().and().csrf().disable()
+        // We don't need CSRF for this example
+        http.csrf().disable()
+                // dont authenticate this particular request
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/login","/user").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(new JwtRequestFilter(authenticationManager(), loginRepo, jwtTokenUtil))
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        ;
+                 .antMatchers(HttpMethod.POST, "/login","/user").permitAll()
+                // all other requests need to be authenticated
+                        .anyRequest().authenticated().and().
+                // make sure we use stateless session; session won't be used to
+                // store user's state.
+                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        // Add a filter to validate the tokens with every request
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+
     }
 
     @Bean

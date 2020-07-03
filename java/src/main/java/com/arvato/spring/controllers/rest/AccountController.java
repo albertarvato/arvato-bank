@@ -1,5 +1,6 @@
 package com.arvato.spring.controllers.rest;
 
+
 import com.arvato.spring.models.Account;
 import com.arvato.spring.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 @RestController()
 @RequestMapping(value = "/user")
 @RequiredArgsConstructor
+@CrossOrigin
 class AccountController {
 
     @Autowired
