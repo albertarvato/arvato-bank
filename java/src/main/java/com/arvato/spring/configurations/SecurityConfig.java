@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -65,7 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests()
-                 .antMatchers(HttpMethod.POST, "/login","/user").permitAll()
+                 .antMatchers(HttpMethod.POST, "/login","/user","/ws").permitAll()
                 // all other requests need to be authenticated
                         .anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to
@@ -73,20 +72,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        // Add a filter to validate the tokens with every request
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        http.cors()
-                .and().authorizeRequests()
-                .antMatchers("/user/**").permitAll()
-                .antMatchers("/transaction/**").permitAll()
-                .antMatchers("/ws/**").permitAll()
-                .antMatchers("/transaction").permitAll()
-                .anyRequest().authenticated()
-                .and().csrf().disable();
     }
 
-
-    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -109,18 +96,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return source;
     }
 
-
-//    @Override
-//    protected void configure(HttpSecurity httpSecurity) throws Exception {
-//
-//        httpSecurity
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.GET, "/user/*").hasRole("ROLE_USER")
-//                .antMatchers(HttpMethod.PUT, "/user/*").hasRole("ROLE_USER")
-//                .antMatchers("/transactions").hasRole("ROLE_USER")
-//                .antMatchers(HttpMethod.POST, "/user").permitAll()
-//                .antMatchers(HttpMethod.POST, "/login").permitAll();
-//    }
 
     @Bean
     protected BCryptPasswordEncoder encoder() {
